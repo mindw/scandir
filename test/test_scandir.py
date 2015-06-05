@@ -6,7 +6,6 @@ import os
 import shutil
 import sys
 import time
-import unittest
 
 try:
     import scandir
@@ -22,9 +21,11 @@ IS_PY3 = sys.version_info >= (3, 0)
 
 if IS_PY3:
     int_types = int
+    import unittest
 else:
     int_types = (int, long)
     str = unicode
+    import unittest2 as unittest
 
 
 if hasattr(os, 'symlink'):
@@ -95,7 +96,7 @@ def teardown():
         shutil.rmtree(TEST_PATH)
 
 
-class TestMixin(object):
+class ScanDirTestMixin(object):
     def setUp(self):
         if not os.path.exists(TEST_PATH):
             setup_main()
@@ -274,32 +275,32 @@ class TestMixin(object):
             shutil.rmtree(dirpath)
 
 if has_scandir:
-    class TestScandirGeneric(TestMixin, unittest.TestCase):
+    class TestScandirGeneric(ScanDirTestMixin, unittest.TestCase):
         def setUp(self):
             self.scandir_func = scandir.scandir_generic
             self.has_file_attributes = False
-            TestMixin.setUp(self)
+            ScanDirTestMixin.setUp(self)
 
 
     if getattr(scandir, 'scandir_python', None):
-        class TestScandirPython(TestMixin, unittest.TestCase):
+        class TestScandirPython(ScanDirTestMixin, unittest.TestCase):
             def setUp(self):
                 self.scandir_func = scandir.scandir_python
                 self.has_file_attributes = True
-                TestMixin.setUp(self)
+                ScanDirTestMixin.setUp(self)
 
 
     if getattr(scandir, 'scandir_c', None):
-        class TestScandirC(TestMixin, unittest.TestCase):
+        class TestScandirC(ScanDirTestMixin, unittest.TestCase):
             def setUp(self):
                 self.scandir_func = scandir.scandir_c
                 self.has_file_attributes = True
-                TestMixin.setUp(self)
+                ScanDirTestMixin.setUp(self)
 
 
 if hasattr(os, 'scandir'):
-    class TestScandirOS(TestMixin, unittest.TestCase):
+    class TestScandirOS(ScanDirTestMixin, unittest.TestCase):
         def setUp(self):
             self.scandir_func = os.scandir
             self.has_file_attributes = True
-            TestMixin.setUp(self)
+            ScanDirTestMixin.setUp(self)

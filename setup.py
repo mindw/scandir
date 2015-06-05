@@ -1,17 +1,18 @@
 """Run "python setup.py install" to install scandir."""
 
-from distutils.core import setup, Extension
+from setuptools import setup, Extension, find_packages
 import os
 import re
 
 # Get version without importing scandir because that will lock the
 # .pyd file (if scandir is already installed) so it can't be
 # overwritten during the install process
-with open(os.path.join(os.path.dirname(__file__), 'scandir.py')) as f:
+with open(os.path.join(os.path.dirname(__file__), 'scandir/__init__.py')) as f:
     for line in f:
-        match = re.match(r"__version__.*'([0-9.]+)'", line)
-        if match:
-            version = match.group(1)
+        if line.startswith('__version__'):
+            _locals = {}
+            exec(line, None, _locals)
+            version = _locals['__version__']
             break
     else:
         raise Exception("Couldn't find version in setup.py")
@@ -34,8 +35,9 @@ setup(
                      "\n"
                      "NOTE: If you're using Python version 3.5+, os.scandir() and the speed "
                      "improvements to os.walk() are already available in the standard library.",
-    py_modules=['scandir'],
-    ext_modules=[Extension('_scandir', ['_scandir.c'])],
+    packages=find_packages(),
+    setup_requires=['pytest-runner'],
+    ext_modules=[Extension('scandir._scandir', ['scandir/_scandir.c'])],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

@@ -27,7 +27,7 @@ import os
 import sys
 
 try:
-    import _scandir
+    from . import _scandir
 except ImportError:
     _scandir = None
 
@@ -384,10 +384,8 @@ if sys.platform == 'win32':
         else:
             scandir_python = _scandir_python
 
-    if _scandir is not None:
+    if _scandir:
         scandir_c = _scandir.scandir
-
-    if _scandir is not None:
         scandir = scandir_c
     elif ctypes is not None:
         scandir = scandir_python
