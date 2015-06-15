@@ -2,8 +2,13 @@
 
 from setuptools import setup, Extension, find_packages
 from os.path import join, abspath, dirname
+import sys
 
 here = abspath(dirname(__file__))
+
+tests_require = ['pytest']
+if sys.version_info < (3,):
+    tests_require.append('unittest2')
 
 setup(
     name='scandir',
@@ -30,6 +35,7 @@ setup(
     packages=find_packages(),
     setup_requires=['pytest-runner', 'setuptools-scm!=1.5.3,!=1.5.4'],
     ext_modules=[Extension('scandir._scandir', ['scandir/_scandir.c'])],
+    tests_require=tests_require,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
