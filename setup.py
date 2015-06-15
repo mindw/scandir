@@ -1,25 +1,17 @@
 """Run "python setup.py install" to install scandir."""
 
 from setuptools import setup, Extension, find_packages
-import os
-import re
+from os.path import join, abspath, dirname
 
-# Get version without importing scandir because that will lock the
-# .pyd file (if scandir is already installed) so it can't be
-# overwritten during the install process
-with open(os.path.join(os.path.dirname(__file__), 'scandir/__init__.py')) as f:
-    for line in f:
-        if line.startswith('__version__'):
-            _locals = {}
-            exec(line, None, _locals)
-            version = _locals['__version__']
-            break
-    else:
-        raise Exception("Couldn't find version in setup.py")
+here = abspath(dirname(__file__))
 
 setup(
     name='scandir',
-    version=version,
+    use_scm_version={
+        'version_scheme': 'guess-next-dev',
+        'local_scheme': 'dirty-tag',
+        'write_to': join(here, 'scandir', '_version.py')
+    },
     author='Ben Hoyt',
     author_email='benhoyt@gmail.com',
     url='https://github.com/benhoyt/scandir',
@@ -36,7 +28,7 @@ setup(
                      "NOTE: If you're using Python version 3.5+, os.scandir() and the speed "
                      "improvements to os.walk() are already available in the standard library.",
     packages=find_packages(),
-    setup_requires=['pytest-runner'],
+    setup_requires=['pytest-runner', 'setuptools-scm!=1.5.3,!=1.5.4'],
     ext_modules=[Extension('scandir._scandir', ['scandir/_scandir.c'])],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
